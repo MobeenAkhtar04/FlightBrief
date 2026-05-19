@@ -1,0 +1,176 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Design tokens ───────────────────────────────── */
+:root {
+  --bg-page:    #0d1117;
+  --bg-card:    #161b22;
+  --bg-input:   #0d1117;
+  --border-card:  #21262d;
+  --border-input: #30363d;
+
+  --text-primary: #e6edf3;
+  --text-muted:   #8b949e;
+  --text-subtle:  #484f58;
+
+  --green:        #3fb950;
+  --green-bg:     #0d2415;
+  --green-border: #1a4229;
+
+  --red:        #f85149;
+  --red-bg:     #2d1317;
+  --red-border: #6e1313;
+
+  --yellow:        #d29922;
+  --yellow-bg:     #2d2109;
+  --yellow-border: #6e4c0a;
+
+  --blue:        #388bfd;
+  --blue-bg:     #0c2044;
+  --blue-border: #1f4a8f;
+
+  --purple:        #bc8cff;
+  --purple-bg:     #1d1230;
+  --purple-border: #4d2d8a;
+}
+
+html.light {
+  --bg-page:    #f0f2f5;
+  --bg-card:    #ffffff;
+  --bg-input:   #f6f8fa;
+  --border-card:  #d0d7de;
+  --border-input: #d0d7de;
+
+  --text-primary: #1c2128;
+  --text-muted:   #57606a;
+  --text-subtle:  #6e7781;
+
+  --green:        #1a7f37;
+  --green-bg:     #dafbe1;
+  --green-border: #74c27a;
+
+  --red:        #cf222e;
+  --red-bg:     #ffebe9;
+  --red-border: #f5b1b0;
+
+  --yellow:        #9a6700;
+  --yellow-bg:     #fff8c5;
+  --yellow-border: #e3c76a;
+
+  --blue:        #0969da;
+  --blue-bg:     #ddf4ff;
+  --blue-border: #54aeff;
+
+  --purple:        #6639ba;
+  --purple-bg:     #fbefff;
+  --purple-border: #c7a7f0;
+}
+
+/* ─── Base ──────────────────────────────────────────── */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.15s, color 0.15s;
+}
+
+/* ─── Utility classes ───────────────────────────────── */
+.label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  font-family: 'Courier New', monospace;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+/* flight rules badges */
+.badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.06em;
+}
+.badge-vfr  { color: var(--green);  background: var(--green-bg);  border-color: var(--green-border); }
+.badge-mvfr { color: var(--yellow); background: var(--yellow-bg); border-color: var(--yellow-border); }
+.badge-ifr  { color: var(--red);    background: var(--red-bg);    border-color: var(--red-border); }
+.badge-lifr { color: var(--purple); background: var(--purple-bg); border-color: var(--purple-border); }
+
+/* ─── Scrollbar ──────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-card); }
+::-webkit-scrollbar-thumb { background: var(--border-input); border-radius: 3px; }
+
+/* ─── Mobile (< 768px) ───────────────────────────────── */
+@media (max-width: 768px) {
+  .metar-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .runway-diagram-row {
+    flex-direction: column;
+  }
+  .runway-canvas-item {
+    width: 100%;
+    min-width: 0;
+  }
+  .notam-list-body {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+}
+
+/* ─── Print ──────────────────────────────────────────── */
+@media print {
+  .no-print { display: none !important; }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 11px;
+  }
+
+  .card {
+    border: 1px solid #ccc !important;
+    background: #fff !important;
+    break-inside: avoid;
+    margin-bottom: 12px;
+  }
+
+  /* force all CSS variables to print-friendly values */
+  :root {
+    --bg-page: #fff;
+    --bg-card: #fff;
+    --text-primary: #000;
+    --text-muted: #555;
+    --text-subtle: #888;
+    --border-card: #ccc;
+    --green: #1a7f37;
+    --green-bg: #f0fff4;
+    --red: #cf222e;
+    --red-bg: #fff0f0;
+    --yellow: #9a6700;
+    --yellow-bg: #fffbe6;
+    --blue: #0550ae;
+    --blue-bg: #f0f7ff;
+    --purple: #6639ba;
+    --purple-bg: #fbefff;
+  }
+}

@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER:     ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB:       ${DB_NAME}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    # no external port exposure in production
+
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile.prod
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      JWT_SECRET:   ${JWT_SECRET}
+    depends_on:
+      db:
+        condition: service_healthy
+    # no external port exposure — nginx proxies to this container
+
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile.prod
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Let's Encrypt certs — run certbot first, then uncomment:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - api
+
+volumes:
+  pgdata:

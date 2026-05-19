@@ -1,0 +1,75 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: flightbrief
+      POSTGRES_PASSWORD: flightbrief
+      POSTGRES_DB: flightbrief
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U flightbrief"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  nginx:
+    build:
+      context: ./nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8001:8000"   # keep exposed for direct dev access; nginx proxies on 443
+    environment:
+      DATABASE_URL: postgresql+asyncpg://flightbrief:flightbrief@db:5432/flightbrief
+      JWT_SECRET: "set-a-real-secret-here-in-production"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./api:/app     # hot reload in dev
+      - ./db:/db
+    develop:
+      watch:
+        - action: sync
+          path: ./api
+          target: /app
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:8001
+    depends_on:
+      - api
+    volumes:
+      - ./frontend:/app    # mount source for hot reload
+      - /app/node_modules  # don't override node_modules from container
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend/src
+          target: /app/src
+
+volumes:
+  pgdata:

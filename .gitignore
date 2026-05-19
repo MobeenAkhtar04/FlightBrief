@@ -1,0 +1,47 @@
+# python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.env
+.venv/
+venv/
+env/
+
+# C++ build artifacts
+cpp/build/
+*.so
+*.dylib
+*.dll
+*.o
+*.a
+
+# node
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# editor stuff
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# docker
+.dockerignore
+
+# secrets / env files (don't commit these)
+*.env
+.env.local
+.env.production
+
+# logs
+*.log
+.env
+__pycache__/
+*.pyc

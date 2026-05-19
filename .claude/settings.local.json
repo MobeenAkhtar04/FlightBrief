@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(docker-compose restart:*)",
+      "Bash(curl -s http://localhost:8001/health)",
+      "Bash(python3 -m json.tool)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); fs=d.get\\('flight_stats',{}\\); print\\('distance:', fs.get\\('distance_nm'\\)\\); print\\('bearing:', fs.get\\('bearing_deg'\\)\\); print\\('flight_time:', fs.get\\('flight_time_display'\\)\\); print\\('fuel:', fs.get\\('fuel_burn_gal'\\)\\)\")",
+      "Bash(docker-compose up:*)",
+      "Bash(docker-compose ps:*)",
+      "Bash(grep -v \"^$\")",
+      "Bash(docker compose:*)",
+      "Bash(docker exec flightbrief-api-1 python3 -c ':*)",
+      "Bash(curl -s \"https://aviationweather.gov/api/data/metar?ids=CYYZ&format=raw\")",
+      "Bash(python3 -c ':*)",
+      "Bash(docker-compose build *)",
+      "Bash(docker-compose logs *)"
+    ]
+  }
+}
