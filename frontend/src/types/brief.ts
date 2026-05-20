@@ -1,3 +1,5 @@
+export type FuelUnit = 'GAL' | 'LBS' | 'L'
+
 export interface CloudLayer {
   coverage: string
   altitude_ft: number | null

@@ -14,7 +14,7 @@ import WindsAloft from './components/WindsAloft'
 import { useBriefApi } from './hooks/useBriefApi'
 import { useAuth } from './hooks/useAuth'
 import Login from './components/Login'
-import type { BriefResponse } from './types/brief'
+import type { BriefResponse, FuelUnit } from './types/brief'
 
 type Tab = 'brief' | 'history'
 
@@ -38,6 +38,7 @@ export default function App() {
   const [runwayHeadings, setRunwayHeadings] = useState<{ dep: number | null; arr: number | null }>({ dep: null, arr: null })
   const [aircraftMeta, setAircraftMeta] = useState<{ label?: string; maxRangeNm?: number }>({})
   const [cruiseAltFt, setCruiseAltFt] = useState<number>(5000)
+  const [fuelUnit, setFuelUnit] = useState<FuelUnit>('GAL')
   const goNoGoRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -159,7 +160,7 @@ export default function App() {
         {activeTab === 'brief' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             <div className="no-print">
-              <BriefForm onSubmit={handleSubmit} loading={loading} />
+              <BriefForm onSubmit={handleSubmit} loading={loading} onFuelUnitChange={setFuelUnit} />
             </div>
 
             {error && (
@@ -212,6 +213,7 @@ export default function App() {
                   arrival={brief.arrival}
                   aircraftLabel={aircraftMeta.label}
                   maxRangeNm={aircraftMeta.maxRangeNm}
+                  fuelUnit={fuelUnit}
                 />
 
                 {/* SIGMETs / AIRMETs — show before runway diagram so hazards are prominent */}

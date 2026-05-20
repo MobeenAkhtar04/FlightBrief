@@ -1,4 +1,19 @@
-import type { FlightStats as FlightStatsType, FuelStatus } from '../types/brief'
+import type { FlightStats as FlightStatsType, FuelStatus, FuelUnit } from '../types/brief'
+
+const LBS_PER_GAL = 6.0
+const L_PER_GAL = 3.785
+
+function galToUnit(gal: number, unit: FuelUnit): number {
+  if (unit === 'LBS') return gal * LBS_PER_GAL
+  if (unit === 'L') return gal * L_PER_GAL
+  return gal
+}
+
+function fuelLabel(unit: FuelUnit): string {
+  if (unit === 'LBS') return 'lbs'
+  if (unit === 'L') return 'L'
+  return 'gal'
+}
 
 interface Props {
   stats: FlightStatsType
@@ -6,6 +21,7 @@ interface Props {
   arrival: string
   aircraftLabel?: string
   maxRangeNm?: number
+  fuelUnit?: FuelUnit
 }
 
 function bearingToCompass(deg: number): string {
@@ -28,7 +44,7 @@ function Stat({ label, value, sub, warn }: { label: string; value: string; sub?:
   )
 }
 
-function FuelBadge({ fuel }: { fuel: FuelStatus }) {
+function FuelBadge({ fuel, unit = 'GAL' }: { fuel: FuelStatus; unit?: FuelUnit }) {
   const colors = {
     OK:   { bg: 'var(--green-bg)',  border: 'var(--green-border)',  text: 'var(--green)'  },
     LOW:  { bg: 'var(--yellow-bg)', border: 'var(--yellow-border)', text: 'var(--yellow)' },
@@ -46,11 +62,11 @@ function FuelBadge({ fuel }: { fuel: FuelStatus }) {
         {icon} FUEL {fuel.status}
       </span>
       {[
-        { label: 'Usable', value: `${fuel.usable_gal}gal` },
-        { label: 'Burn', value: `${fuel.burn_gal}gal` },
-        { label: 'Reserve', value: `${fuel.reserve_gal.toFixed(1)}gal` },
+        { label: 'Usable',       value: `${galToUnit(fuel.usable_gal, unit).toFixed(1)}${fuelLabel(unit)}` },
+        { label: 'Burn',         value: `${galToUnit(fuel.burn_gal, unit).toFixed(1)}${fuelLabel(unit)}` },
+        { label: 'Reserve',      value: `${galToUnit(fuel.reserve_gal, unit).toFixed(1)}${fuelLabel(unit)}` },
         { label: 'Reserve time', value: `${Math.max(0, fuel.reserve_min).toFixed(0)}min` },
-        { label: 'Required', value: `${fuel.required_reserve_min}min` },
+        { label: 'Required',     value: `${fuel.required_reserve_min}min` },
       ].map(({ label, value }) => (
         <div key={label} style={{ fontSize: 11, fontFamily: '"Courier New", monospace' }}>
           <span style={{ color: 'var(--text-muted)' }}>{label} </span>
@@ -61,7 +77,7 @@ function FuelBadge({ fuel }: { fuel: FuelStatus }) {
   )
 }
 
-export default function FlightStats({ stats, departure, arrival, aircraftLabel, maxRangeNm }: Props) {
+export default function FlightStats({ stats, departure, arrival, aircraftLabel, maxRangeNm, fuelUnit = 'GAL' }: Props) {
   const rangeExceeded = maxRangeNm != null && stats.distance_nm > maxRangeNm
   const hasSunrise = stats.sunrise_dep || stats.sunrise_arr
 
@@ -77,7 +93,7 @@ export default function FlightStats({ stats, departure, arrival, aircraftLabel, 
         <Stat label="DISTANCE" value={`${stats.distance_nm.toFixed(0)} NM`} />
         <Stat label="BEARING" value={`${stats.bearing_deg.toFixed(0)}°`} sub={bearingToCompass(stats.bearing_deg)} />
         <Stat label="EST TIME" value={stats.flight_time_display} />
-        <Stat label="FUEL (+10%)" value={`${stats.fuel_burn_gal.toFixed(1)} GAL`} />
+        <Stat label={`FUEL (+10%)`} value={`${galToUnit(stats.fuel_burn_gal, fuelUnit).toFixed(1)} ${fuelLabel(fuelUnit).toUpperCase()}`} />
       </div>
 
       {/* density altitude + sunrise rows */}
@@ -131,7 +147,7 @@ export default function FlightStats({ stats, departure, arrival, aircraftLabel, 
         </div>
       )}
 
-      {stats.fuel_status && <FuelBadge fuel={stats.fuel_status} />}
+      {stats.fuel_status && <FuelBadge fuel={stats.fuel_status} unit={fuelUnit} />}
     </div>
   )
 }

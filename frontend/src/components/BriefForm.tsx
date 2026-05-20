@@ -1,4 +1,20 @@
 import { useState, FormEvent } from 'react'
+import type { FuelUnit } from '../types/brief'
+
+const LBS_PER_GAL = 6.0
+const L_PER_GAL = 3.785
+
+function galToUnit(gal: number, unit: FuelUnit): number {
+  if (unit === 'LBS') return gal * LBS_PER_GAL
+  if (unit === 'L') return gal * L_PER_GAL
+  return gal
+}
+
+function unitToGal(val: number, unit: FuelUnit): number {
+  if (unit === 'LBS') return val / LBS_PER_GAL
+  if (unit === 'L') return val / L_PER_GAL
+  return val
+}
 
 export interface BriefFormData {
   departure: string
@@ -18,6 +34,7 @@ export interface BriefFormData {
 interface Props {
   onSubmit: (data: BriefFormData) => void
   loading: boolean
+  onFuelUnitChange?: (unit: FuelUnit) => void
 }
 
 interface AircraftPreset {
@@ -57,7 +74,7 @@ const selectStyle: React.CSSProperties = {
   cursor: 'pointer',
 }
 
-export default function BriefForm({ onSubmit, loading }: Props) {
+export default function BriefForm({ onSubmit, loading, onFuelUnitChange }: Props) {
   const [dep, setDep] = useState('')
   const [arr, setArr] = useState('')
   const [alt, setAlt] = useState('')
@@ -70,14 +87,24 @@ export default function BriefForm({ onSubmit, loading }: Props) {
   const [approachType, setApproachType] = useState('visual')
   const [showAdv, setShowAdv] = useState(false)
   const [presetIdx, setPresetIdx] = useState(0)
+  const [fuelUnit, setFuelUnit] = useState<FuelUnit>('GAL')
+
+  function handleUnitChange(unit: FuelUnit) {
+    const ffGal = unitToGal(parseFloat(fuel) || 0, fuelUnit)
+    const ufGal = unitToGal(parseFloat(usableFuel) || 0, fuelUnit)
+    setFuel(galToUnit(ffGal, unit).toFixed(2))
+    setUsableFuel(galToUnit(ufGal, unit).toFixed(1))
+    setFuelUnit(unit)
+    onFuelUnitChange?.(unit)
+  }
 
   function handlePresetChange(idx: number) {
     setPresetIdx(idx)
     const p = PRESETS[idx]
     if (p.label !== 'Custom') {
       setSpeed(p.speed)
-      setFuel(p.fuel)
-      if (p.usableFuel != null) setUsableFuel(String(p.usableFuel))
+      setFuel(galToUnit(parseFloat(p.fuel), fuelUnit).toFixed(2))
+      if (p.usableFuel != null) setUsableFuel(galToUnit(p.usableFuel, fuelUnit).toFixed(1))
       setCruiseAlt(String(p.cruiseAlt))
     }
   }
@@ -103,8 +130,8 @@ export default function BriefForm({ onSubmit, loading }: Props) {
       arrival: arr.trim().toUpperCase(),
       alternate: alt.trim() ? alt.trim().toUpperCase() : undefined,
       cruise_speed_kts: parseFloat(speed) || 122,
-      fuel_flow_gph: parseFloat(fuel) || 8.5,
-      usable_fuel_gal: usableFuel ? parseFloat(usableFuel) : undefined,
+      fuel_flow_gph: unitToGal(parseFloat(fuel) || galToUnit(8.5, fuelUnit), fuelUnit),
+      usable_fuel_gal: usableFuel ? unitToGal(parseFloat(usableFuel), fuelUnit) : undefined,
       cruise_alt_ft: cruiseAlt ? parseInt(cruiseAlt) : 5000,
       dep_runway_heading: depRwy ? parseFloat(depRwy) : undefined,
       arr_runway_heading: arrRwy ? parseFloat(arrRwy) : undefined,
@@ -214,7 +241,10 @@ export default function BriefForm({ onSubmit, loading }: Props) {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
               {[
                 { label: 'CRUISE SPEED (kts)', val: speed, set: handleSpeedChange, step: '1',   min: '50' },
-                { label: 'FUEL FLOW (gph)',    val: fuel,  set: handleFuelChange,  step: '0.1', min: '1'  },
+                {
+                  label: fuelUnit === 'GAL' ? 'FUEL FLOW (gph)' : fuelUnit === 'LBS' ? 'FUEL FLOW (lbs/hr)' : 'FUEL FLOW (L/hr)',
+                  val: fuel, set: handleFuelChange, step: '0.1', min: '1',
+                },
                 { label: 'CRUISE ALT (ft)',    val: cruiseAlt, set: setCruiseAlt,  step: '500', min: '1000' },
               ].map(({ label, val, set, ...rest }) => (
                 <div key={label}>
@@ -226,7 +256,27 @@ export default function BriefForm({ onSubmit, loading }: Props) {
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
               <div>
-                <div className="label" style={{ marginBottom: 5 }}>USABLE FUEL (gal)</div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
+                  <div className="label">
+                    USABLE FUEL ({fuelUnit === 'GAL' ? 'gal' : fuelUnit === 'LBS' ? 'lbs' : 'L'})
+                  </div>
+                  <div style={{ display: 'flex', gap: 2 }}>
+                    {(['GAL', 'LBS', 'L'] as FuelUnit[]).map(u => (
+                      <button
+                        key={u} type="button"
+                        onClick={() => handleUnitChange(u)}
+                        style={{
+                          background: fuelUnit === u ? 'var(--blue)' : 'var(--bg-input)',
+                          border: '1px solid var(--border-input)',
+                          borderRadius: 4, padding: '1px 6px', cursor: 'pointer',
+                          color: fuelUnit === u ? '#fff' : 'var(--text-muted)',
+                          fontFamily: '"Courier New", monospace', fontSize: 9,
+                          letterSpacing: '0.06em',
+                        }}
+                      >{u}</button>
+                    ))}
+                  </div>
+                </div>
                 <input
                   type="number" step="0.5" min="1"
                   value={usableFuel} onChange={e => setUsableFuel(e.target.value)}
