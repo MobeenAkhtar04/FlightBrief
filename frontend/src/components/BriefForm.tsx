@@ -151,7 +151,7 @@ export default function BriefForm({ onSubmit, loading, onFuelUnitChange }: Props
           <input
             type="text" value={dep}
             onChange={e => setDep(e.target.value.toUpperCase())}
-            placeholder="KJFK" maxLength={4} required
+            placeholder="KDEP" maxLength={4} required
             style={{ ...inputStyle, fontSize: 20, letterSpacing: '0.14em', padding: '9px 12px' }}
           />
         </div>
@@ -163,7 +163,7 @@ export default function BriefForm({ onSubmit, loading, onFuelUnitChange }: Props
           <input
             type="text" value={arr}
             onChange={e => setArr(e.target.value.toUpperCase())}
-            placeholder="KBOS" maxLength={4} required
+            placeholder="KARR" maxLength={4} required
             style={{ ...inputStyle, fontSize: 20, letterSpacing: '0.14em', padding: '9px 12px' }}
           />
         </div>
@@ -173,7 +173,7 @@ export default function BriefForm({ onSubmit, loading, onFuelUnitChange }: Props
           <input
             type="text" value={alt}
             onChange={e => setAlt(e.target.value.toUpperCase())}
-            placeholder="KPHL" maxLength={4}
+            placeholder="KALT" maxLength={4}
             style={{ ...inputStyle, fontSize: 20, letterSpacing: '0.14em', padding: '9px 12px' }}
           />
         </div>
