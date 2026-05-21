@@ -78,6 +78,9 @@ export default function BriefForm({ onSubmit, loading, onFuelUnitChange }: Props
   const [dep, setDep] = useState('')
   const [arr, setArr] = useState('')
   const [alt, setAlt] = useState('')
+  const [depErr, setDepErr] = useState('')
+  const [arrErr, setArrErr] = useState('')
+  const [altErr, setAltErr] = useState('')
   const [speed, setSpeed] = useState('122')
   const [fuel, setFuel] = useState('8.5')
   const [usableFuel, setUsableFuel] = useState('40')
@@ -121,9 +124,23 @@ export default function BriefForm({ onSubmit, loading, onFuelUnitChange }: Props
     setPresetIdx(match >= 0 ? match : PRESETS.length - 1)
   }
 
+  const icaoRe = /^[A-Z][A-Z0-9]{3}$/
+
+  function validateIcao(val: string): string {
+    if (!val) return 'Required'
+    if (!icaoRe.test(val)) return 'Enter a valid 4-letter ICAO code (e.g. KJFK)'
+    return ''
+  }
+
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    if (!dep.trim() || !arr.trim()) return
+    const de = validateIcao(dep)
+    const ae = validateIcao(arr)
+    const ale = alt.trim() ? validateIcao(alt) : ''
+    setDepErr(de)
+    setArrErr(ae)
+    setAltErr(ale)
+    if (de || ae || ale) return
     const p = PRESETS[presetIdx]
     onSubmit({
       departure: dep.trim().toUpperCase(),
@@ -150,32 +167,35 @@ export default function BriefForm({ onSubmit, loading, onFuelUnitChange }: Props
           <div className="label" style={{ marginBottom: 5 }}>DEPARTURE</div>
           <input
             type="text" value={dep}
-            onChange={e => setDep(e.target.value.toUpperCase())}
-            placeholder="KDEP" maxLength={4} required
-            style={{ ...inputStyle, fontSize: 20, letterSpacing: '0.14em', padding: '9px 12px' }}
+            onChange={e => { setDep(e.target.value.toUpperCase()); setDepErr('') }}
+            placeholder="e.g. KJFK" maxLength={4} required
+            style={{ ...inputStyle, fontSize: 20, letterSpacing: '0.14em', padding: '9px 12px', borderColor: depErr ? 'var(--red-border)' : undefined }}
           />
+          {depErr && <div style={{ fontSize: 10, color: 'var(--red)', marginTop: 4 }}>{depErr}</div>}
         </div>
 
-        <div style={{ color: 'var(--text-subtle)', fontSize: 18, paddingBottom: 9 }}>→</div>
+        <div style={{ color: 'var(--text-subtle)', fontSize: 18, paddingBottom: depErr || arrErr ? 24 : 9 }}>→</div>
 
         <div style={{ flex: 1, minWidth: 100 }}>
           <div className="label" style={{ marginBottom: 5 }}>ARRIVAL</div>
           <input
             type="text" value={arr}
-            onChange={e => setArr(e.target.value.toUpperCase())}
-            placeholder="KARR" maxLength={4} required
-            style={{ ...inputStyle, fontSize: 20, letterSpacing: '0.14em', padding: '9px 12px' }}
+            onChange={e => { setArr(e.target.value.toUpperCase()); setArrErr('') }}
+            placeholder="e.g. KBOS" maxLength={4} required
+            style={{ ...inputStyle, fontSize: 20, letterSpacing: '0.14em', padding: '9px 12px', borderColor: arrErr ? 'var(--red-border)' : undefined }}
           />
+          {arrErr && <div style={{ fontSize: 10, color: 'var(--red)', marginTop: 4 }}>{arrErr}</div>}
         </div>
 
         <div style={{ flex: 1, minWidth: 100 }}>
           <div className="label" style={{ marginBottom: 5 }}>ALTERNATE <span style={{ color: 'var(--text-subtle)' }}>(opt)</span></div>
           <input
             type="text" value={alt}
-            onChange={e => setAlt(e.target.value.toUpperCase())}
-            placeholder="KALT" maxLength={4}
-            style={{ ...inputStyle, fontSize: 20, letterSpacing: '0.14em', padding: '9px 12px' }}
+            onChange={e => { setAlt(e.target.value.toUpperCase()); setAltErr('') }}
+            placeholder="e.g. KPHL" maxLength={4}
+            style={{ ...inputStyle, fontSize: 20, letterSpacing: '0.14em', padding: '9px 12px', borderColor: altErr ? 'var(--red-border)' : undefined }}
           />
+          {altErr && <div style={{ fontSize: 10, color: 'var(--red)', marginTop: 4 }}>{altErr}</div>}
         </div>
 
         <button
