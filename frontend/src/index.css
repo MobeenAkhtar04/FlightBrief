@@ -70,6 +70,8 @@ html.light {
 /* ─── Base ──────────────────────────────────────────── */
 * { box-sizing: border-box; }
 
+input::placeholder { color: var(--text-subtle); opacity: 1; }
+
 body {
   margin: 0;
   background: var(--bg-page);
