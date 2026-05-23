@@ -95,62 +95,35 @@ function drawDiagram(
   ctx.setLineDash([])
   ctx.restore()
 
-  // ── approach indicator — plane silhouette + dashed path ──
+  // ── approach indicator — ✈ icon + dashed path ──
   {
-    const apchAngle  = toRad(((rwyHdg + 180) % 360) - 90)
-    const landAngle  = toRad(rwyHdg - 90)
-    const amber      = isDark ? '#e8c547' : '#9a6700'
-    const iconDist   = 72   // center of icon, clear of tick marks (R-10 = 78)
+    const apchAngle = toRad(((rwyHdg + 180) % 360) - 90)
+    const landAngle = toRad(rwyHdg - 90)
+    const color     = isDark ? '#c9d1d9' : '#424a53'
+    const iconDist  = 71
 
-    // dashed approach path from icon nose to runway threshold
-    ctx.strokeStyle  = amber
-    ctx.lineWidth    = 1.5
-    ctx.globalAlpha  = 0.6
+    // dashed path from icon to runway threshold
+    ctx.strokeStyle = color
+    ctx.lineWidth   = 1.5
+    ctx.globalAlpha = 0.5
     ctx.setLineDash([4, 4])
     ctx.beginPath()
-    ctx.moveTo(cx + (iconDist - 10) * Math.cos(apchAngle), cy + (iconDist - 10) * Math.sin(apchAngle))
+    ctx.moveTo(cx + (iconDist - 11) * Math.cos(apchAngle), cy + (iconDist - 11) * Math.sin(apchAngle))
     ctx.lineTo(cx + (rwyLen / 2 + 5) * Math.cos(apchAngle), cy + (rwyLen / 2 + 5) * Math.sin(apchAngle))
     ctx.stroke()
     ctx.setLineDash([])
-    ctx.globalAlpha  = 1
+    ctx.globalAlpha = 1
 
-    // aircraft silhouette — rotate so nose points toward runway (landAngle)
+    // ✈ character rotated to face landing direction
+    // ✈ (U+2708) naturally points upper-right (NE) in most fonts → offset by +π/4
     ctx.save()
     ctx.translate(cx + iconDist * Math.cos(apchAngle), cy + iconDist * Math.sin(apchAngle))
-    ctx.rotate(landAngle + Math.PI / 2)
-    ctx.fillStyle = amber
-
-    // fuselage: nose (top) to tail
-    ctx.beginPath()
-    ctx.moveTo(0, -11)    // nose tip
-    ctx.lineTo(2.5, 8)    // tail right
-    ctx.lineTo(0,   5.5)  // tail notch
-    ctx.lineTo(-2.5, 8)   // tail left
-    ctx.closePath()
-    ctx.fill()
-
-    // swept wings (widest part ~18px, well inside compass)
-    ctx.beginPath()
-    ctx.moveTo(0, -1)
-    ctx.lineTo(13,  5)
-    ctx.lineTo(11,  8)
-    ctx.lineTo(0,   4)
-    ctx.lineTo(-11, 8)
-    ctx.lineTo(-13, 5)
-    ctx.closePath()
-    ctx.fill()
-
-    // small horizontal stabilizer
-    ctx.beginPath()
-    ctx.moveTo(0, 5.5)
-    ctx.lineTo(5,  9)
-    ctx.lineTo(4.5, 10.5)
-    ctx.lineTo(0,  7.5)
-    ctx.lineTo(-4.5, 10.5)
-    ctx.lineTo(-5,  9)
-    ctx.closePath()
-    ctx.fill()
-
+    ctx.rotate(landAngle + Math.PI / 4)
+    ctx.fillStyle       = color
+    ctx.font            = '15px Arial, sans-serif'
+    ctx.textAlign       = 'center'
+    ctx.textBaseline    = 'middle'
+    ctx.fillText('✈', 0, 0)
     ctx.restore()
   }
 
@@ -357,7 +330,7 @@ function AirportCanvas({ metar, rwyHdg, label, isDark }: AirportCanvasProps) {
           { color: '#388bfd', label: 'wind vector' },
           { color: '#3fb950', label: 'headwind', dashed: true },
           { color: '#d29922', label: 'crosswind', dashed: true },
-          { color: '#c9a227', label: 'approach', dashed: true },
+          { color: isDark ? '#c9d1d9' : '#424a53', label: 'approach', dashed: true },
         ].map(({ color, label: lbl, dashed }) => (
           <div key={lbl} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <div style={{
