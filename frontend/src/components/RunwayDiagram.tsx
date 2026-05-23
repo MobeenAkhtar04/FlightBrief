@@ -95,61 +95,59 @@ function drawDiagram(
   ctx.setLineDash([])
   ctx.restore()
 
-  // ── approach indicator — plane icon + dashed path ──
-  // icon at 70px (well inside tick marks at R-10=78px), dashes from 63px to threshold
+  // ── approach indicator — plane silhouette + dashed path ──
   {
-    const apchAngle = toRad(((rwyHdg + 180) % 360) - 90)
-    const landingAngle = toRad(rwyHdg - 90)
-    const amber = isDark ? '#c9a227' : '#9a6700'
+    const apchAngle  = toRad(((rwyHdg + 180) % 360) - 90)
+    const landAngle  = toRad(rwyHdg - 90)
+    const amber      = isDark ? '#e8c547' : '#9a6700'
+    const iconDist   = 72   // center of icon, clear of tick marks (R-10 = 78)
 
-    // dashed approach path
-    ctx.strokeStyle = amber
-    ctx.lineWidth = 1.5
-    ctx.globalAlpha = 0.65
+    // dashed approach path from icon nose to runway threshold
+    ctx.strokeStyle  = amber
+    ctx.lineWidth    = 1.5
+    ctx.globalAlpha  = 0.6
     ctx.setLineDash([4, 4])
     ctx.beginPath()
-    ctx.moveTo(cx + 63 * Math.cos(apchAngle), cy + 63 * Math.sin(apchAngle))
-    ctx.lineTo(cx + (rwyLen / 2 + 6) * Math.cos(apchAngle), cy + (rwyLen / 2 + 6) * Math.sin(apchAngle))
+    ctx.moveTo(cx + (iconDist - 10) * Math.cos(apchAngle), cy + (iconDist - 10) * Math.sin(apchAngle))
+    ctx.lineTo(cx + (rwyLen / 2 + 5) * Math.cos(apchAngle), cy + (rwyLen / 2 + 5) * Math.sin(apchAngle))
     ctx.stroke()
     ctx.setLineDash([])
-    ctx.globalAlpha = 1
+    ctx.globalAlpha  = 1
 
-    // top-down aircraft silhouette pointing in landing direction
-    const iconX = cx + 70 * Math.cos(apchAngle)
-    const iconY = cy + 70 * Math.sin(apchAngle)
+    // aircraft silhouette — rotate so nose points toward runway (landAngle)
     ctx.save()
-    ctx.translate(iconX, iconY)
-    ctx.rotate(landingAngle + Math.PI / 2)
+    ctx.translate(cx + iconDist * Math.cos(apchAngle), cy + iconDist * Math.sin(apchAngle))
+    ctx.rotate(landAngle + Math.PI / 2)
     ctx.fillStyle = amber
 
-    // fuselage
+    // fuselage: nose (top) to tail
     ctx.beginPath()
-    ctx.moveTo(0, -7)
-    ctx.lineTo(1.5, 5)
-    ctx.lineTo(0, 3.5)
-    ctx.lineTo(-1.5, 5)
+    ctx.moveTo(0, -11)    // nose tip
+    ctx.lineTo(2.5, 8)    // tail right
+    ctx.lineTo(0,   5.5)  // tail notch
+    ctx.lineTo(-2.5, 8)   // tail left
     ctx.closePath()
     ctx.fill()
 
-    // swept wings
+    // swept wings (widest part ~18px, well inside compass)
     ctx.beginPath()
-    ctx.moveTo(0, -0.5)
-    ctx.lineTo(8, 3.5)
-    ctx.lineTo(7, 5.5)
-    ctx.lineTo(0, 2.5)
-    ctx.lineTo(-7, 5.5)
-    ctx.lineTo(-8, 3.5)
+    ctx.moveTo(0, -1)
+    ctx.lineTo(13,  5)
+    ctx.lineTo(11,  8)
+    ctx.lineTo(0,   4)
+    ctx.lineTo(-11, 8)
+    ctx.lineTo(-13, 5)
     ctx.closePath()
     ctx.fill()
 
-    // horizontal stabilizer
+    // small horizontal stabilizer
     ctx.beginPath()
-    ctx.moveTo(0, 3.5)
-    ctx.lineTo(4, 6.5)
-    ctx.lineTo(3.5, 7.5)
-    ctx.lineTo(0, 5.5)
-    ctx.lineTo(-3.5, 7.5)
-    ctx.lineTo(-4, 6.5)
+    ctx.moveTo(0, 5.5)
+    ctx.lineTo(5,  9)
+    ctx.lineTo(4.5, 10.5)
+    ctx.lineTo(0,  7.5)
+    ctx.lineTo(-4.5, 10.5)
+    ctx.lineTo(-5,  9)
     ctx.closePath()
     ctx.fill()
 
