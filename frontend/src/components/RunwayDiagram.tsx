@@ -95,34 +95,36 @@ function drawDiagram(
   ctx.setLineDash([])
   ctx.restore()
 
-  // ── approach indicator — triangle arrow + dashed path ──
+  // ── approach indicator — triangle at outer compass + offset dashed path ──
   {
     const apchAngle = toRad(((rwyHdg + 180) % 360) - 90)
     const landAngle = toRad(rwyHdg - 90)
     const color     = isDark ? '#c9d1d9' : '#424a53'
-    const iconDist  = 71
+    const iconDist  = R - 6   // sit at outer compass ring
 
-    // dashed approach path — thick and bright
+    // offset dashes 5px sideways so they don't overlap the headwind line
+    const ox = 5 * Math.cos(apchAngle + Math.PI / 2)
+    const oy = 5 * Math.sin(apchAngle + Math.PI / 2)
     ctx.strokeStyle = color
-    ctx.lineWidth   = 2
-    ctx.globalAlpha = 0.9
+    ctx.lineWidth   = 1.5
+    ctx.globalAlpha = 0.85
     ctx.setLineDash([5, 3])
     ctx.beginPath()
-    ctx.moveTo(cx + (iconDist - 12) * Math.cos(apchAngle), cy + (iconDist - 12) * Math.sin(apchAngle))
-    ctx.lineTo(cx + (rwyLen / 2 + 5) * Math.cos(apchAngle), cy + (rwyLen / 2 + 5) * Math.sin(apchAngle))
+    ctx.moveTo(cx + (iconDist - 12) * Math.cos(apchAngle) + ox, cy + (iconDist - 12) * Math.sin(apchAngle) + oy)
+    ctx.lineTo(cx + (rwyLen / 2 + 5) * Math.cos(apchAngle) + ox, cy + (rwyLen / 2 + 5) * Math.sin(apchAngle) + oy)
     ctx.stroke()
     ctx.setLineDash([])
     ctx.globalAlpha = 1
 
-    // filled triangle pointing toward the runway
+    // small triangle at outer compass ring pointing toward runway
     ctx.save()
     ctx.translate(cx + iconDist * Math.cos(apchAngle), cy + iconDist * Math.sin(apchAngle))
     ctx.rotate(landAngle + Math.PI / 2)
     ctx.fillStyle = color
     ctx.beginPath()
-    ctx.moveTo(0, -10)   // nose — points toward runway
-    ctx.lineTo(7,  6)    // right base
-    ctx.lineTo(-7, 6)    // left base
+    ctx.moveTo(0, -7)
+    ctx.lineTo(5,  5)
+    ctx.lineTo(-5, 5)
     ctx.closePath()
     ctx.fill()
     ctx.restore()
