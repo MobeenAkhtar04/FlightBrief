@@ -95,6 +95,46 @@ function drawDiagram(
   ctx.setLineDash([])
   ctx.restore()
 
+  // ── approach path indicator ──
+  {
+    const apchAngle = toRad(((rwyHdg + 180) % 360) - 90)
+    const landingAngle = toRad(rwyHdg - 90)
+    const amber = isDark ? '#c9a227' : '#9a6700'
+
+    // dashed glide path from near compass rose to runway threshold
+    ctx.strokeStyle = amber
+    ctx.lineWidth = 1.5
+    ctx.globalAlpha = 0.7
+    ctx.setLineDash([5, 5])
+    ctx.beginPath()
+    ctx.moveTo(cx + (R - 20) * Math.cos(apchAngle), cy + (R - 20) * Math.sin(apchAngle))
+    ctx.lineTo(cx + (rwyLen / 2 + 5) * Math.cos(apchAngle), cy + (rwyLen / 2 + 5) * Math.sin(apchAngle))
+    ctx.stroke()
+    ctx.setLineDash([])
+    ctx.globalAlpha = 1
+
+    // small aircraft triangle at compass rose edge pointing toward runway
+    const iconX = cx + (R - 11) * Math.cos(apchAngle)
+    const iconY = cy + (R - 11) * Math.sin(apchAngle)
+    ctx.fillStyle = amber
+    ctx.beginPath()
+    ctx.moveTo(iconX + 8 * Math.cos(landingAngle),       iconY + 8 * Math.sin(landingAngle))
+    ctx.lineTo(iconX + 5 * Math.cos(landingAngle + 2.5), iconY + 5 * Math.sin(landingAngle + 2.5))
+    ctx.lineTo(iconX + 5 * Math.cos(landingAngle - 2.5), iconY + 5 * Math.sin(landingAngle - 2.5))
+    ctx.closePath()
+    ctx.fill()
+
+    // APCH label between runway end and dashes
+    const lblDist = rwyLen / 2 + 16
+    ctx.font = 'bold 7px "Courier New", monospace'
+    ctx.fillStyle = amber
+    ctx.globalAlpha = 0.85
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText('APCH', cx + lblDist * Math.cos(apchAngle), cy + lblDist * Math.sin(apchAngle))
+    ctx.globalAlpha = 1
+  }
+
   // ── wind arrow + components ──
   const windDir = metar.wind_dir ?? 0
   const windSpd = metar.wind_speed
@@ -298,6 +338,7 @@ function AirportCanvas({ metar, rwyHdg, label, isDark }: AirportCanvasProps) {
           { color: '#388bfd', label: 'wind vector' },
           { color: '#3fb950', label: 'headwind', dashed: true },
           { color: '#d29922', label: 'crosswind', dashed: true },
+          { color: '#c9a227', label: 'approach', dashed: true },
         ].map(({ color, label: lbl, dashed }) => (
           <div key={lbl} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <div style={{
