@@ -95,44 +95,65 @@ function drawDiagram(
   ctx.setLineDash([])
   ctx.restore()
 
-  // ── approach path indicator ──
+  // ── approach indicator — plane icon + dashed path ──
+  // icon at 70px (well inside tick marks at R-10=78px), dashes from 63px to threshold
   {
     const apchAngle = toRad(((rwyHdg + 180) % 360) - 90)
     const landingAngle = toRad(rwyHdg - 90)
     const amber = isDark ? '#c9a227' : '#9a6700'
 
-    // dashed glide path from near compass rose to runway threshold
+    // dashed approach path
     ctx.strokeStyle = amber
     ctx.lineWidth = 1.5
-    ctx.globalAlpha = 0.7
-    ctx.setLineDash([5, 5])
+    ctx.globalAlpha = 0.65
+    ctx.setLineDash([4, 4])
     ctx.beginPath()
-    ctx.moveTo(cx + (R - 20) * Math.cos(apchAngle), cy + (R - 20) * Math.sin(apchAngle))
-    ctx.lineTo(cx + (rwyLen / 2 + 5) * Math.cos(apchAngle), cy + (rwyLen / 2 + 5) * Math.sin(apchAngle))
+    ctx.moveTo(cx + 63 * Math.cos(apchAngle), cy + 63 * Math.sin(apchAngle))
+    ctx.lineTo(cx + (rwyLen / 2 + 6) * Math.cos(apchAngle), cy + (rwyLen / 2 + 6) * Math.sin(apchAngle))
     ctx.stroke()
     ctx.setLineDash([])
     ctx.globalAlpha = 1
 
-    // small aircraft triangle at compass rose edge pointing toward runway
-    const iconX = cx + (R - 11) * Math.cos(apchAngle)
-    const iconY = cy + (R - 11) * Math.sin(apchAngle)
+    // top-down aircraft silhouette pointing in landing direction
+    const iconX = cx + 70 * Math.cos(apchAngle)
+    const iconY = cy + 70 * Math.sin(apchAngle)
+    ctx.save()
+    ctx.translate(iconX, iconY)
+    ctx.rotate(landingAngle + Math.PI / 2)
     ctx.fillStyle = amber
+
+    // fuselage
     ctx.beginPath()
-    ctx.moveTo(iconX + 8 * Math.cos(landingAngle),       iconY + 8 * Math.sin(landingAngle))
-    ctx.lineTo(iconX + 5 * Math.cos(landingAngle + 2.5), iconY + 5 * Math.sin(landingAngle + 2.5))
-    ctx.lineTo(iconX + 5 * Math.cos(landingAngle - 2.5), iconY + 5 * Math.sin(landingAngle - 2.5))
+    ctx.moveTo(0, -7)
+    ctx.lineTo(1.5, 5)
+    ctx.lineTo(0, 3.5)
+    ctx.lineTo(-1.5, 5)
     ctx.closePath()
     ctx.fill()
 
-    // APCH label between runway end and dashes
-    const lblDist = rwyLen / 2 + 16
-    ctx.font = 'bold 7px "Courier New", monospace'
-    ctx.fillStyle = amber
-    ctx.globalAlpha = 0.85
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText('APCH', cx + lblDist * Math.cos(apchAngle), cy + lblDist * Math.sin(apchAngle))
-    ctx.globalAlpha = 1
+    // swept wings
+    ctx.beginPath()
+    ctx.moveTo(0, -0.5)
+    ctx.lineTo(8, 3.5)
+    ctx.lineTo(7, 5.5)
+    ctx.lineTo(0, 2.5)
+    ctx.lineTo(-7, 5.5)
+    ctx.lineTo(-8, 3.5)
+    ctx.closePath()
+    ctx.fill()
+
+    // horizontal stabilizer
+    ctx.beginPath()
+    ctx.moveTo(0, 3.5)
+    ctx.lineTo(4, 6.5)
+    ctx.lineTo(3.5, 7.5)
+    ctx.lineTo(0, 5.5)
+    ctx.lineTo(-3.5, 7.5)
+    ctx.lineTo(-4, 6.5)
+    ctx.closePath()
+    ctx.fill()
+
+    ctx.restore()
   }
 
   // ── wind arrow + components ──
