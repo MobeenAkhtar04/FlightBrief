@@ -95,32 +95,14 @@ function drawDiagram(
   ctx.setLineDash([])
   ctx.restore()
 
-  // ── approach indicator — triangle at outer compass + offset dashed path ──
+  // ── approach indicator — triangle at outer compass ring only ──
   {
     const apchAngle = toRad(((rwyHdg + 180) % 360) - 90)
     const landAngle = toRad(rwyHdg - 90)
-    const color     = isDark ? '#c9d1d9' : '#424a53'
-    const iconDist  = R - 6   // sit at outer compass ring
-
-    // offset dashes 5px sideways so they don't overlap the headwind line
-    const ox = 5 * Math.cos(apchAngle + Math.PI / 2)
-    const oy = 5 * Math.sin(apchAngle + Math.PI / 2)
-    ctx.strokeStyle = color
-    ctx.lineWidth   = 1.5
-    ctx.globalAlpha = 0.85
-    ctx.setLineDash([5, 3])
-    ctx.beginPath()
-    ctx.moveTo(cx + (iconDist - 12) * Math.cos(apchAngle) + ox, cy + (iconDist - 12) * Math.sin(apchAngle) + oy)
-    ctx.lineTo(cx + (rwyLen / 2 + 5) * Math.cos(apchAngle) + ox, cy + (rwyLen / 2 + 5) * Math.sin(apchAngle) + oy)
-    ctx.stroke()
-    ctx.setLineDash([])
-    ctx.globalAlpha = 1
-
-    // small triangle at outer compass ring pointing toward runway
     ctx.save()
-    ctx.translate(cx + iconDist * Math.cos(apchAngle), cy + iconDist * Math.sin(apchAngle))
+    ctx.translate(cx + (R - 6) * Math.cos(apchAngle), cy + (R - 6) * Math.sin(apchAngle))
     ctx.rotate(landAngle + Math.PI / 2)
-    ctx.fillStyle = color
+    ctx.fillStyle = isDark ? '#c9d1d9' : '#424a53'
     ctx.beginPath()
     ctx.moveTo(0, -7)
     ctx.lineTo(5,  5)
@@ -330,17 +312,26 @@ function AirportCanvas({ metar, rwyHdg, label, isDark }: AirportCanvasProps) {
       {/* legend */}
       <div style={{ padding: '0 14px 8px', display: 'flex', gap: 12, justifyContent: 'center' }}>
         {[
-          { color: '#388bfd', label: 'wind vector' },
-          { color: '#3fb950', label: 'headwind', dashed: true },
-          { color: '#d29922', label: 'crosswind', dashed: true },
-          { color: isDark ? '#c9d1d9' : '#424a53', label: 'approach', dashed: true },
-        ].map(({ color, label: lbl, dashed }) => (
+          { color: '#388bfd', label: 'wind vector',       dashed: false, triangle: false },
+          { color: '#3fb950', label: 'headwind',           dashed: true,  triangle: false },
+          { color: '#d29922', label: 'crosswind',          dashed: true,  triangle: false },
+          { color: isDark ? '#c9d1d9' : '#424a53', label: 'aircraft direction', dashed: false, triangle: true },
+        ].map(({ color, label: lbl, dashed, triangle }) => (
           <div key={lbl} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <div style={{
-              width: 18, height: 1.5,
-              background: dashed ? 'none' : color,
-              borderTop: dashed ? `2px dashed ${color}` : 'none',
-            }} />
+            {triangle ? (
+              <div style={{
+                width: 0, height: 0,
+                borderLeft: '5px solid transparent',
+                borderRight: '5px solid transparent',
+                borderBottom: `9px solid ${color}`,
+              }} />
+            ) : (
+              <div style={{
+                width: 18, height: 1.5,
+                background: dashed ? 'none' : color,
+                borderTop: dashed ? `2px dashed ${color}` : 'none',
+              }} />
+            )}
             <span style={{ fontSize: 9, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{lbl}</span>
           </div>
         ))}
