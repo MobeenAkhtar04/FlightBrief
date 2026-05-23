@@ -95,35 +95,36 @@ function drawDiagram(
   ctx.setLineDash([])
   ctx.restore()
 
-  // ── approach indicator — ✈ icon + dashed path ──
+  // ── approach indicator — triangle arrow + dashed path ──
   {
     const apchAngle = toRad(((rwyHdg + 180) % 360) - 90)
     const landAngle = toRad(rwyHdg - 90)
     const color     = isDark ? '#c9d1d9' : '#424a53'
     const iconDist  = 71
 
-    // dashed path from icon to runway threshold
+    // dashed approach path — thick and bright
     ctx.strokeStyle = color
-    ctx.lineWidth   = 1.5
-    ctx.globalAlpha = 0.5
-    ctx.setLineDash([4, 4])
+    ctx.lineWidth   = 2
+    ctx.globalAlpha = 0.9
+    ctx.setLineDash([5, 3])
     ctx.beginPath()
-    ctx.moveTo(cx + (iconDist - 11) * Math.cos(apchAngle), cy + (iconDist - 11) * Math.sin(apchAngle))
+    ctx.moveTo(cx + (iconDist - 12) * Math.cos(apchAngle), cy + (iconDist - 12) * Math.sin(apchAngle))
     ctx.lineTo(cx + (rwyLen / 2 + 5) * Math.cos(apchAngle), cy + (rwyLen / 2 + 5) * Math.sin(apchAngle))
     ctx.stroke()
     ctx.setLineDash([])
     ctx.globalAlpha = 1
 
-    // ✈ character rotated to face landing direction
-    // ✈ (U+2708) naturally points upper-right (NE) in most fonts → offset by +π/4
+    // filled triangle pointing toward the runway
     ctx.save()
     ctx.translate(cx + iconDist * Math.cos(apchAngle), cy + iconDist * Math.sin(apchAngle))
-    ctx.rotate(landAngle + Math.PI / 4)
-    ctx.fillStyle       = color
-    ctx.font            = '15px Arial, sans-serif'
-    ctx.textAlign       = 'center'
-    ctx.textBaseline    = 'middle'
-    ctx.fillText('✈', 0, 0)
+    ctx.rotate(landAngle + Math.PI / 2)
+    ctx.fillStyle = color
+    ctx.beginPath()
+    ctx.moveTo(0, -10)   // nose — points toward runway
+    ctx.lineTo(7,  6)    // right base
+    ctx.lineTo(-7, 6)    // left base
+    ctx.closePath()
+    ctx.fill()
     ctx.restore()
   }
 
