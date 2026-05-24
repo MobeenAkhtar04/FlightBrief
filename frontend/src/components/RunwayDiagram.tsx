@@ -25,20 +25,19 @@ function drawDiagram(
   ctx: CanvasRenderingContext2D,
   metar: MetarData,
   rwyHdg: number,
-  isDark: boolean
 ) {
   const w = SIZE, h = SIZE
   const cx = w / 2, cy = h / 2
   const R = w / 2 - 22   // compass rose radius
 
-  // ── background ──
-  ctx.fillStyle = isDark ? '#0d1117' : '#f0f2f5'
+  // ── background — always dark ──
+  ctx.fillStyle = '#0d1117'
   ctx.fillRect(0, 0, w, h)
 
   // ── compass rose circle ──
   ctx.beginPath()
   ctx.arc(cx, cy, R, 0, 2 * Math.PI)
-  ctx.strokeStyle = isDark ? '#30363d' : '#d0d7de'
+  ctx.strokeStyle = '#30363d'
   ctx.lineWidth = 1
   ctx.stroke()
 
@@ -50,7 +49,7 @@ function drawDiagram(
     ctx.beginPath()
     ctx.moveTo(cx + inner * Math.cos(a), cy + inner * Math.sin(a))
     ctx.lineTo(cx + R * Math.cos(a), cy + R * Math.sin(a))
-    ctx.strokeStyle = isDark ? '#30363d' : '#c8d4de'
+    ctx.strokeStyle = '#30363d'
     ctx.lineWidth = isMajor ? 1.5 : 0.7
     ctx.stroke()
   }
@@ -62,21 +61,19 @@ function drawDiagram(
   const cardinals = [{ l: 'N', b: 0 }, { l: 'E', b: 90 }, { l: 'S', b: 180 }, { l: 'W', b: 270 }]
   for (const { l, b } of cardinals) {
     const a = toRad(b - 90)
-    ctx.fillStyle = l === 'N' ? (isDark ? '#e6edf3' : '#24292f') : (isDark ? '#8b949e' : '#656d76')
+    ctx.fillStyle = l === 'N' ? '#e6edf3' : '#8b949e'
     ctx.fillText(l, cx + (R + 13) * Math.cos(a), cy + (R + 13) * Math.sin(a))
   }
 
   // ── runway rectangle ──
-  // ctx.rotate(heading * PI/180) orients a vertical rect to the runway heading:
-  // heading 0 = vertical (N-S), heading 90 = horizontal (E-W)
   const rwyLen = 82, rwyWidth = 15
   ctx.save()
   ctx.translate(cx, cy)
   ctx.rotate(toRad(rwyHdg))
-  ctx.fillStyle = isDark ? '#21262d' : '#b0bec8'
+  ctx.fillStyle = '#21262d'
   ctx.fillRect(-rwyWidth / 2, -rwyLen / 2, rwyWidth, rwyLen)
   // threshold bars
-  ctx.strokeStyle = isDark ? '#e6edf3' : '#f0f2f5'
+  ctx.strokeStyle = '#e6edf3'
   ctx.lineWidth = 2
   ;[-1, 1].forEach(sign => {
     ctx.beginPath()
@@ -85,7 +82,7 @@ function drawDiagram(
     ctx.stroke()
   })
   // centerline dashes
-  ctx.strokeStyle = isDark ? '#e6edf3' : '#f0f2f5'
+  ctx.strokeStyle = '#e6edf3'
   ctx.lineWidth = 1
   ctx.setLineDash([8, 6])
   ctx.beginPath()
@@ -102,7 +99,7 @@ function drawDiagram(
     ctx.save()
     ctx.translate(cx + (R - 6) * Math.cos(apchAngle), cy + (R - 6) * Math.sin(apchAngle))
     ctx.rotate(landAngle + Math.PI / 2)
-    ctx.fillStyle = isDark ? '#c9d1d9' : '#424a53'
+    ctx.fillStyle = '#c9d1d9'
     ctx.beginPath()
     ctx.moveTo(0, -7)
     ctx.lineTo(5,  5)
@@ -213,7 +210,7 @@ function drawDiagram(
     }
   } else {
     // calm — just draw a small X at center
-    ctx.strokeStyle = isDark ? '#484f58' : '#afb8c1'
+    ctx.strokeStyle = '#484f58'
     ctx.lineWidth = 1.5
     const r = 8
     ;[[-r, -r, r, r], [-r, r, r, -r]].forEach(([x1, y1, x2, y2]) => {
@@ -224,7 +221,7 @@ function drawDiagram(
   // center dot
   ctx.beginPath()
   ctx.arc(cx, cy, 3, 0, 2 * Math.PI)
-  ctx.fillStyle = isDark ? '#8b949e' : '#656d76'
+  ctx.fillStyle = '#8b949e'
   ctx.fill()
 }
 
@@ -249,7 +246,7 @@ function AirportCanvas({ metar, rwyHdg, label, isDark }: AirportCanvasProps) {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
     ctx.scale(dpr, dpr)
-    drawDiagram(ctx, metar, rwyHdg, isDark)
+    drawDiagram(ctx, metar, rwyHdg)
   }, [metar, rwyHdg, isDark])
 
   const windDir = metar.wind_dir ?? 0
@@ -315,7 +312,7 @@ function AirportCanvas({ metar, rwyHdg, label, isDark }: AirportCanvasProps) {
           { color: '#388bfd', label: 'wind vector',       dashed: false, triangle: false },
           { color: '#3fb950', label: 'headwind',           dashed: true,  triangle: false },
           { color: '#d29922', label: 'crosswind',          dashed: true,  triangle: false },
-          { color: isDark ? '#c9d1d9' : '#424a53', label: 'aircraft direction', dashed: false, triangle: true },
+          { color: '#c9d1d9', label: 'aircraft direction', dashed: false, triangle: true },
         ].map(({ color, label: lbl, dashed, triangle }) => (
           <div key={lbl} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             {triangle ? (
