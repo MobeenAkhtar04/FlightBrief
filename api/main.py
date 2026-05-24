@@ -623,6 +623,9 @@ async def create_brief(
             bearing_deg,
         ))
 
+    # Approach minimums are based on ARRIVAL weather — departure has no ceiling requirement for IFR takeoff
+    arr_rules  = classify_conditions(ceil_arr, vis_arr)
+    # Overall flight rules displayed uses worst of both (informational)
     worst_ceil = min(ceil_dep, ceil_arr)
     worst_vis  = min(vis_dep, vis_arr)
     flight_rules = classify_conditions(worst_ceil, worst_vis)
@@ -632,17 +635,28 @@ async def create_brief(
     fuel_status_dict = None
     if req.usable_fuel_gal and flight_time_hrs > 0:
         fuel_status_dict = calc_fuel_status(
-            req.usable_fuel_gal, req.fuel_flow_gph, flight_time_hrs, flight_rules
+            req.usable_fuel_gal, req.fuel_flow_gph, flight_time_hrs, arr_rules
         )
 
+    # Go/no-go uses ARRIVAL conditions for approach minimums
     decision, reasons = make_go_no_go(
-        flight_rules, approach_type, worst_ceil, worst_vis,
+        arr_rules, approach_type, ceil_arr, vis_arr,
         wind_speed, crosswind,
         fuel_status=fuel_status_dict,
         has_alternate=bool(alt),
         arr_ceiling=ceil_arr,
         arr_vis=vis_arr,
     )
+
+    # Separate departure takeoff check — IFR takeoff minimum is typically ½SM vis, no ceiling
+    if vis_dep < 0.5:
+        reasons.append(f"Departure ({dep}) visibility {vis_dep:.1f}SM — below standard IFR takeoff minimum (½SM)")
+        if decision == 'GO':
+            decision = 'NOGO'
+    elif vis_dep < 1.0:
+        reasons.append(f"Departure ({dep}) low visibility {vis_dep:.1f}SM — verify published takeoff minimums")
+        if decision == 'GO':
+            decision = 'CAUTION'
 
     if ceil_arr < ceil_dep:
         reasons.insert(0, f"Arrival ({arr}) has lower ceiling than departure")
