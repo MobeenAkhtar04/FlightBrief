@@ -116,6 +116,10 @@ body {
 .badge-ifr  { color: var(--red);    background: var(--red-bg);    border-color: var(--red-border); }
 .badge-lifr { color: var(--purple); background: var(--purple-bg); border-color: var(--purple-border); }
 
+/* print-only elements hidden on screen */
+.print-header { display: none; }
+.print-footer { display: none; }
+
 /* ─── Scrollbar ──────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-card); }
@@ -141,38 +145,84 @@ body {
 
 /* ─── Print ──────────────────────────────────────────── */
 @media print {
+  @page { margin: 1.8cm 1.5cm; size: A4; }
+
   .no-print { display: none !important; }
+  .print-only { display: block !important; }
 
   body {
     background: #fff !important;
     color: #000 !important;
-    font-size: 11px;
+    font-size: 10.5px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
+  /* print header — route + timestamp */
+  .print-header {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2px solid #000;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+  }
+
+  /* cards: border, no background bleed, avoid mid-card breaks */
   .card {
-    border: 1px solid #ccc !important;
+    border: 1px solid #bbb !important;
     background: #fff !important;
     break-inside: avoid;
-    margin-bottom: 12px;
+    page-break-inside: avoid;
+    margin-bottom: 10px;
+  }
+
+  /* charts and canvases: don't let them get clipped */
+  canvas { max-width: 100% !important; }
+
+  /* give each major section its own page breathing room */
+  .metar-grid, .runway-diagram-row { break-inside: avoid; }
+
+  /* page break before NOTAM list so it starts fresh */
+  .notam-section { break-before: auto; }
+
+  /* footer watermark */
+  .print-footer {
+    display: block !important;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 8px;
+    color: #888;
+    border-top: 1px solid #ccc;
+    padding-top: 4px;
   }
 
   /* force all CSS variables to print-friendly values */
   :root {
     --bg-page: #fff;
     --bg-card: #fff;
+    --bg-input: #fff;
     --text-primary: #000;
-    --text-muted: #555;
+    --text-muted: #444;
     --text-subtle: #888;
-    --border-card: #ccc;
+    --border-card: #bbb;
+    --border-input: #bbb;
     --green: #1a7f37;
-    --green-bg: #f0fff4;
+    --green-bg: #eafff0;
+    --green-border: #8fd4a3;
     --red: #cf222e;
     --red-bg: #fff0f0;
+    --red-border: #f5b1b0;
     --yellow: #9a6700;
     --yellow-bg: #fffbe6;
+    --yellow-border: #e3c76a;
     --blue: #0550ae;
     --blue-bg: #f0f7ff;
+    --blue-border: #54aeff;
     --purple: #6639ba;
     --purple-bg: #fbefff;
+    --purple-border: #c7a7f0;
   }
 }

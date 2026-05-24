@@ -760,3 +760,20 @@ async def get_briefing(
     except Exception as e:
         print(f"[db] error fetching briefing {briefing_id}: {e}")
         raise HTTPException(status_code=500, detail="Database error")
+
+
+@app.get("/briefings/{briefing_id}/public")
+async def get_briefing_public(
+    briefing_id: str,
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        briefing = await crud.get_briefing_by_id(db, briefing_id)
+        if not briefing:
+            raise HTTPException(status_code=404, detail="Briefing not found")
+        return briefing
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"[db] error fetching public briefing {briefing_id}: {e}")
+        raise HTTPException(status_code=500, detail="Database error")

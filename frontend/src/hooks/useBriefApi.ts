@@ -56,13 +56,28 @@ export function useBriefApi() {
     }
   }
 
-  // load a brief from history without making a new API call
   function loadBrief(b: BriefResponse) {
     setBrief(b)
     setError(null)
   }
 
-  return { fetchBrief, loadBrief, loading, error, brief }
+  async function loadPublic(id: string) {
+    setLoading(true)
+    setError(null)
+    setBrief(null)
+    try {
+      const resp = await fetch(`${API_BASE}/briefings/${id}/public`)
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
+      const result: BriefResponse = await resp.json()
+      setBrief(result)
+    } catch (e: any) {
+      setError(e?.message || 'Failed to load briefing')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return { fetchBrief, loadBrief, loadPublic, loading, error, brief }
 }
 
 
