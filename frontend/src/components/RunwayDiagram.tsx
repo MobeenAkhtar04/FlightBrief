@@ -145,31 +145,7 @@ function drawDiagram(
     const cxvx = wvx - hwvx
     const cxvy = wvy - hwvy
 
-    // draw headwind component (green dashed along runway)
-    ctx.strokeStyle = '#3fb950'
-    ctx.lineWidth = 1.5
-    ctx.globalAlpha = 0.55
-    ctx.setLineDash([4, 3])
-    ctx.beginPath()
-    ctx.moveTo(cx, cy)
-    ctx.lineTo(cx + hwvx, cy + hwvy)
-    ctx.stroke()
-    ctx.setLineDash([])
-    ctx.globalAlpha = 1
-
-    // draw crosswind component (yellow dashed perpendicular)
-    ctx.strokeStyle = '#d29922'
-    ctx.lineWidth = 1.5
-    ctx.globalAlpha = 0.75
-    ctx.setLineDash([4, 3])
-    ctx.beginPath()
-    ctx.moveTo(cx + hwvx, cy + hwvy)
-    ctx.lineTo(wx, wy)
-    ctx.stroke()
-    ctx.setLineDash([])
-    ctx.globalAlpha = 1
-
-    // main wind arrow (blue, solid)
+    // main wind arrow (blue, solid) — drawn first so components render on top
     ctx.strokeStyle = '#388bfd'
     ctx.lineWidth = 2.5
     ctx.beginPath()
@@ -194,6 +170,30 @@ function drawDiagram(
     )
     ctx.closePath()
     ctx.fill()
+
+    // headwind component (green dashed) — drawn on top of wind arrow
+    ctx.strokeStyle = '#3fb950'
+    ctx.lineWidth = 1.5
+    ctx.globalAlpha = 0.8
+    ctx.setLineDash([4, 3])
+    ctx.beginPath()
+    ctx.moveTo(cx, cy)
+    ctx.lineTo(cx + hwvx, cy + hwvy)
+    ctx.stroke()
+    ctx.setLineDash([])
+    ctx.globalAlpha = 1
+
+    // crosswind component (yellow dashed) — drawn on top of wind arrow
+    ctx.strokeStyle = '#d29922'
+    ctx.lineWidth = 1.5
+    ctx.globalAlpha = 0.9
+    ctx.setLineDash([4, 3])
+    ctx.beginPath()
+    ctx.moveTo(cx + hwvx, cy + hwvy)
+    ctx.lineTo(wx, wy)
+    ctx.stroke()
+    ctx.setLineDash([])
+    ctx.globalAlpha = 1
 
     // gust ring (dashed, if gusting)
     if (windGust && windGust > windSpd) {
