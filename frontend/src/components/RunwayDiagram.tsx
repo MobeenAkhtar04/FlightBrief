@@ -99,7 +99,7 @@ function drawDiagram(
     ctx.save()
     ctx.translate(cx + (R - 6) * Math.cos(apchAngle), cy + (R - 6) * Math.sin(apchAngle))
     ctx.rotate(landAngle + Math.PI / 2)
-    ctx.fillStyle = '#c9d1d9'
+    ctx.fillStyle = '#ffffff'
     ctx.beginPath()
     ctx.moveTo(0, -7)
     ctx.lineTo(5,  5)
@@ -312,7 +312,7 @@ function AirportCanvas({ metar, rwyHdg, label, isDark }: AirportCanvasProps) {
           { color: '#388bfd', label: 'wind vector',       dashed: false, triangle: false },
           { color: '#3fb950', label: 'headwind',           dashed: true,  triangle: false },
           { color: '#d29922', label: 'crosswind',          dashed: true,  triangle: false },
-          { color: '#c9d1d9', label: 'aircraft direction', dashed: false, triangle: true },
+          { color: '#ffffff', label: 'aircraft direction', dashed: false, triangle: true },
         ].map(({ color, label: lbl, dashed, triangle }) => (
           <div key={lbl} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             {triangle ? (
