@@ -131,6 +131,8 @@ export interface BriefResponse {
   decision_reasons: string[]
   flight_rules: string
   approach_type: string
+  dep_runway_heading: number | null
+  arr_runway_heading: number | null
 }
 
 export interface BriefingSummary {

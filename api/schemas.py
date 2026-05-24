@@ -21,6 +21,8 @@ class BriefRequest(BaseModel):
     usable_fuel_gal: Optional[float] = Field(default=None, gt=0)
     cruise_alt_ft: Optional[int] = Field(default=5000, gt=0)
     approach_type: Optional[str] = Field(default='visual')
+    dep_runway_heading: Optional[float] = Field(default=None, ge=0, le=360)
+    arr_runway_heading: Optional[float] = Field(default=None, ge=0, le=360)
 
     def model_post_init(self, __context):
         self.departure = self.departure.upper()

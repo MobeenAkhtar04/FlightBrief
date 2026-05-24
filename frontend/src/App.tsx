@@ -80,7 +80,7 @@ export default function App() {
     setRunwayHeadings({ dep: data.dep_runway_heading ?? null, arr: data.arr_runway_heading ?? null })
     setAircraftMeta({ label: data.aircraft_label, maxRangeNm: data.max_range_nm })
     setCruiseAltFt(data.cruise_alt_ft ?? 5000)
-    const { dep_runway_heading, arr_runway_heading, aircraft_label, max_range_nm, ...apiData } = data
+    const { aircraft_label, max_range_nm, ...apiData } = data
     fetchBrief(apiData)
   }
 
@@ -159,8 +159,8 @@ export default function App() {
       <RunwayDiagram
         depMetar={brief.departure_metar}
         arrMetar={brief.arrival_metar}
-        depRunwayHeading={runwayHeadings.dep}
-        arrRunwayHeading={runwayHeadings.arr}
+        depRunwayHeading={runwayHeadings.dep ?? brief.dep_runway_heading ?? null}
+        arrRunwayHeading={runwayHeadings.arr ?? brief.arr_runway_heading ?? null}
         isDark={isDark}
         departure={brief.departure}
         arrival={brief.arrival}

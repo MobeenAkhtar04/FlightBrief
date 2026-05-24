@@ -719,6 +719,8 @@ async def create_brief(
         "decision_reasons": reasons,
         "flight_rules": flight_rules,
         "approach_type": approach_type,
+        "dep_runway_heading": req.dep_runway_heading,
+        "arr_runway_heading": req.arr_runway_heading,
     }
 
     try:
