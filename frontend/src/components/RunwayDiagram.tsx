@@ -195,18 +195,23 @@ function drawDiagram(
     ctx.setLineDash([])
     ctx.globalAlpha = 1
 
-    // gust ring (dashed, if gusting)
+    // gust extension — dashed line beyond wind tip along same direction
     if (windGust && windGust > windSpd) {
-      const gustLen = Math.min(windGust * 3.8, maxLen)
-      ctx.strokeStyle = '#388bfd'
-      ctx.lineWidth = 1
-      ctx.globalAlpha = 0.3
-      ctx.setLineDash([3, 4])
-      ctx.beginPath()
-      ctx.arc(cx, cy, gustLen, 0, 2 * Math.PI)
-      ctx.stroke()
-      ctx.setLineDash([])
-      ctx.globalAlpha = 1
+      const gustLen = Math.min(windGust * 3.8, maxLen * 1.15)
+      const gustWx = cx + gustLen * Math.cos(windToA)
+      const gustWy = cy + gustLen * Math.sin(windToA)
+      if (gustLen > arrowLen + 2) {
+        ctx.strokeStyle = '#388bfd'
+        ctx.lineWidth = 1.5
+        ctx.globalAlpha = 0.45
+        ctx.setLineDash([3, 5])
+        ctx.beginPath()
+        ctx.moveTo(wx, wy)
+        ctx.lineTo(gustWx, gustWy)
+        ctx.stroke()
+        ctx.setLineDash([])
+        ctx.globalAlpha = 1
+      }
     }
   } else {
     // calm — just draw a small X at center
