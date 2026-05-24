@@ -279,7 +279,7 @@ function AirportCanvas({ metar, rwyHdg, label, isDark }: AirportCanvasProps) {
   return (
     <div className="runway-canvas-item" style={{
       flex: 1,
-      background: 'var(--bg-card)',
+      background: 'var(--bg-input)',
       border: '1px solid var(--border-card)',
       borderRadius: 10,
       overflow: 'hidden',
