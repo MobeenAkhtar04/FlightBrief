@@ -14,7 +14,11 @@
       "Bash(curl -s \"https://aviationweather.gov/api/data/metar?ids=CYYZ&format=raw\")",
       "Bash(python3 -c ':*)",
       "Bash(docker-compose build *)",
-      "Bash(docker-compose logs *)"
+      "Bash(docker-compose logs *)",
+      "Bash(npx tsc *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git add *)",
+      "Bash(git push *)"
     ]
   }
 }
