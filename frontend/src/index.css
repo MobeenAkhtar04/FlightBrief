@@ -36,15 +36,15 @@
 }
 
 html.light {
-  --bg-page:    #f0f2f5;
-  --bg-card:    #ffffff;
-  --bg-input:   #f6f8fa;
-  --border-card:  #d0d7de;
-  --border-input: #d0d7de;
+  --bg-page:    #c8cdd6;
+  --bg-card:    #d4d9e2;
+  --bg-input:   #bfc5ce;
+  --border-card:  #a8b2bc;
+  --border-input: #a8b2bc;
 
   --text-primary: #1c2128;
-  --text-muted:   #57606a;
-  --text-subtle:  #6e7781;
+  --text-muted:   #3d4450;
+  --text-subtle:  #57606a;
 
   --green:        #1a7f37;
   --green-bg:     #dafbe1;
