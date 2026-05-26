@@ -39,6 +39,12 @@ METAR_URL   = f"{AWC_BASE}/metar"
 TAF_URL     = f"{AWC_BASE}/taf"
 AIRPORT_URL = f"{AWC_BASE}/airport"
 
+AWC_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Accept": "text/plain,application/json,*/*",
+    "Referer": "https://aviationweather.gov/",
+}
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -520,7 +526,7 @@ async def create_brief(
     arr = req.arrival
     alt = req.alternate
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(headers=AWC_HEADERS) as client:
         tasks = [
             asyncio.create_task(fetch_metar(dep, client)),
             asyncio.create_task(fetch_metar(arr, client)),
@@ -598,7 +604,7 @@ async def create_brief(
     pireps_raw = []
     airsigmets_raw = []
     if coords_dep and coords_arr:
-        async with httpx.AsyncClient() as c2:
+        async with httpx.AsyncClient(headers=AWC_HEADERS) as c2:
             wa_raw, pireps_result, sigmet_result = await asyncio.gather(
                 fetch_winds_aloft(dep, arr, c2),
                 fetch_pireps(lat1, lon1, lat2, lon2, c2),
